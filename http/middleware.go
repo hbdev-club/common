@@ -14,7 +14,6 @@ import (
 
 var (
 	requestIdKey = "X-Request-Id"
-	log          = logger.Log
 )
 
 type Middleware func(http.Handler) http.Handler
@@ -40,20 +39,20 @@ func RequestMiddleware(handler http.Handler) http.Handler {
 		requestMDC := &logger.RequestMDC{RequestId: requestId}
 		parsedURL, err := url.Parse(r.RequestURI)
 		if err != nil {
-			log.WithCtx(ctx).Error(fmt.Sprintf("Error parse URI: %v", err))
+			logger.Log.WithCtx(ctx).Error(fmt.Sprintf("Error parse URI: %v", err))
 		} else {
 			requestMDC.RequestUri = parsedURL.Path
 			requestMDC.RequestQuery = parsedURL.RawQuery
 		}
 
-		log.WithMDC(requestMDC).Info(fmt.Sprintf("Request method:%s, url:%s", r.Method, r.URL))
+		logger.Log.WithMDC(requestMDC).Info(fmt.Sprintf("Request method:%s, url:%s", r.Method, r.URL))
 		defer func() {
 			duration := time.Since(requestAt).Milliseconds()
 			responseMDC := &logger.ResponseMDC{
 				RequestId:        requestId,
 				ResponseDuration: duration,
 			}
-			log.WithMDC(responseMDC).Info(fmt.Sprintf("Response duration:%vms", duration))
+			logger.Log.WithMDC(responseMDC).Info(fmt.Sprintf("Response duration:%vms", duration))
 		}()
 
 		w.Header().Set(requestIdKey, requestId)
