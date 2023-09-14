@@ -1,0 +1,9 @@
+# JetBrains
+.idea/
+
+
+# Project
+logs/
+tests/
+
+run.log
