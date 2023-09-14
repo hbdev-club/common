@@ -18,7 +18,7 @@ var (
 
 	defaultLevel  = zapcore.InfoLevel
 	encoderConfig zapcore.EncoderConfig
-	log           *Logger
+	Log           *Logger
 )
 
 type Logger struct {
@@ -82,23 +82,40 @@ func genConsoleOutputCore() zapcore.Core {
 	)
 }
 
-func InitLog(appName_, fileName_ string, defaultLevel_ zapcore.Level) {
+// InitLog
+//
+//	Params example:
+//	InitLog("service-name", "/www/app/logs/application.log", "INFO")
+func InitLog(appName_, fileName_, level_ string) *Logger {
+	if Log != nil {
+		return Log
+	}
 	if appName_ != "" {
 		appName = appName_
 	}
 	if fileName_ != "" {
 		fileName = fileName_
 	}
-	defaultLevel = zapcore.InfoLevel
+	if level_ == "" {
+		defaultLevel = zapcore.InfoLevel
+	} else {
+		var err error
+		defaultLevel, err = zapcore.ParseLevel(level_)
+		if err != nil {
+			panic("invalid log level")
+		}
+	}
 	//
 	buildEncoderConfig()
-	log = &Logger{zap.New(
+	Log = &Logger{zap.New(
 		zapcore.NewTee(
 			genFileOutputCore(), genConsoleOutputCore(),
 		),
 		zap.AddCaller(),
 		zap.AddStacktrace(zapcore.PanicLevel),
 	)}
-	log.Info(fmt.Sprintf("Init log successfully, app name: %v, file name: %v, default level: %v",
-		appName_, fileName_, defaultLevel_))
+	Log.Info(fmt.Sprintf("Init log successfully, app name: %v, file name: %v, level: %v",
+		appName_, fileName_, level_))
+
+	return Log
 }

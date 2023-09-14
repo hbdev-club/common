@@ -14,7 +14,7 @@ import (
 
 var (
 	requestIdKey = "X-Request-Id"
-	log          *logger.Logger
+	log          = logger.Log
 )
 
 type Middleware func(http.Handler) http.Handler
