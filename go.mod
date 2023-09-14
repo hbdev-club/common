@@ -1,4 +1,4 @@
-module hbdev/common
+module github.com/hbdev-club/common
 
 go 1.21.0
 

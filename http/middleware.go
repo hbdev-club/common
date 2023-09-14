@@ -9,7 +9,7 @@ import (
 	//
 	"github.com/google/uuid"
 	//
-	"hbdev/common/logger"
+	"github.com/hbdev-club/common/logger"
 )
 
 var (
