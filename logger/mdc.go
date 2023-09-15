@@ -31,7 +31,7 @@ type ResponseMDC struct {
 }
 
 func (mdc *BaseMDC) GetRequestId() string {
-	return mdc.GetRequestId()
+	return mdc.RequestId
 }
 
 func (mdc *BaseMDC) MarshalLogObject(enc zapcore.ObjectEncoder) error {
