@@ -4,10 +4,13 @@ import "go.uber.org/zap/zapcore"
 
 var (
 	RequestIdKey = "request_id"
+
+	Ignore = "ignore"
 )
 
 type MDCMarshaler interface {
 	MarshalLogObject(enc zapcore.ObjectEncoder) error
+	GetRequestId() string
 }
 
 type BaseMDC struct {
@@ -15,14 +18,20 @@ type BaseMDC struct {
 }
 
 type RequestMDC struct {
-	RequestId    string
+	*BaseMDC
+	//RequestId    string
 	RequestUri   string
 	RequestQuery string
 }
 
 type ResponseMDC struct {
-	RequestId        string
+	*BaseMDC
+	//RequestId        string
 	ResponseDuration int64
+}
+
+func (mdc *BaseMDC) GetRequestId() string {
+	return mdc.GetRequestId()
 }
 
 func (mdc *BaseMDC) MarshalLogObject(enc zapcore.ObjectEncoder) error {

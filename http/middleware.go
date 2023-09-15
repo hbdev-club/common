@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 	//
 	"github.com/google/uuid"
@@ -36,22 +37,26 @@ func RequestMiddleware(handler http.Handler) http.Handler {
 		ctx := r.Context()
 		ctx = context.WithValue(ctx, logger.RequestIdKey, requestId)
 
-		requestMDC := &logger.RequestMDC{RequestId: requestId}
+		requestMDC := &logger.RequestMDC{}
 		parsedURL, err := url.Parse(r.RequestURI)
 		if err != nil {
 			logger.Log.WithCtx(ctx).Error(fmt.Sprintf("Error parse URI: %v", err))
 		} else {
 			requestMDC.RequestUri = parsedURL.Path
 			requestMDC.RequestQuery = parsedURL.RawQuery
+			// Ignore ready request
+			if strings.HasSuffix(requestMDC.RequestUri, "/ready") {
+				requestId = logger.Ignore
+			}
 		}
+		requestMDC.RequestId = requestId
 
 		logger.Log.WithMDC(requestMDC).Info(fmt.Sprintf("Request method:%s, url:%s", r.Method, r.URL))
 		defer func() {
 			duration := time.Since(requestAt).Milliseconds()
-			responseMDC := &logger.ResponseMDC{
-				RequestId:        requestId,
-				ResponseDuration: duration,
-			}
+
+			responseMDC := &logger.ResponseMDC{ResponseDuration: duration}
+			responseMDC.RequestId = requestId
 			logger.Log.WithMDC(responseMDC).Info(fmt.Sprintf("Response duration:%vms", duration))
 		}()
 

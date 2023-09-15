@@ -14,7 +14,6 @@ var (
 	appName = "unknown"
 
 	fileName = "/www/app/logs/application.log"
-	//fileName = "logs/application.log"
 
 	defaultLevel  = zapcore.InfoLevel
 	encoderConfig zapcore.EncoderConfig
@@ -31,6 +30,10 @@ func (l *Logger) WithCtx(ctx context.Context) *zap.Logger {
 }
 
 func (l *Logger) WithMDC(mdc MDCMarshaler) *zap.Logger {
+	requestId := mdc.GetRequestId()
+	if requestId == Ignore {
+		return l.With()
+	}
 	return l.With(zap.Object("mdc", mdc))
 }
 
