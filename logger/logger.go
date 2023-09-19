@@ -64,7 +64,7 @@ func genFileOutputCore() zapcore.Core {
 		Compress:   false,
 	}
 	jsonEncoder := zapcore.NewJSONEncoder(encoderConfig)
-	jsonEncoder.AddString("@version", "go_1")
+	jsonEncoder.AddInt("@version", 1)
 	jsonEncoder.AddString("app_name", appName)
 
 	return zapcore.NewCore(
